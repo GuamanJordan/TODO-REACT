@@ -10,19 +10,42 @@ export function TaskItem({ task }) {
     priority: task.priority,
     dueDate: task.dueDate || ''
   });
+  const [errors, setErrors] = useState({});
+
+
+  // Validación de campos al editar
+  const validate = () => {
+    const newErrors = {};
+    if (!editData.title.trim()) {
+      newErrors.title = 'El título es obligatorio';
+    } else if (editData.title.length > 100) {
+      newErrors.title = 'Máximo 100 caracteres';
+    }
+    if (editData.description.length > 500) {
+      newErrors.description = 'Máximo 500 caracteres';
+    }
+    if (editData.dueDate) {
+      const today = new Date();
+      const due = new Date(editData.dueDate);
+      today.setHours(0,0,0,0);
+      if (due < today) {
+        newErrors.dueDate = 'La fecha no puede ser pasada';
+      }
+    }
+    return newErrors;
+  };
 
   const handleSave = () => {
-    if (!editData.title.trim()) {
-      alert('El título es obligatorio');
-      return;
-    }
-    updateTask(task.id, editData);
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+    updateTask(task._id, editData);
     setIsEditing(false);
   };
 
   const handleDelete = () => {
     if (confirm('¿Eliminar esta tarea?')) {
-      deleteTask(task.id);
+      deleteTask(task._id);
     }
   };
 
@@ -41,11 +64,13 @@ export function TaskItem({ task }) {
           onChange={(e) => setEditData({ ...editData, title: e.target.value })}
           autoFocus
         />
+        {errors.title && <div className="form-error">{errors.title}</div>}
         <textarea
           value={editData.description}
           onChange={(e) => setEditData({ ...editData, description: e.target.value })}
           rows={2}
         />
+        {errors.description && <div className="form-error">{errors.description}</div>}
         <div className="form-row">
           <select
             value={editData.priority}
@@ -60,14 +85,23 @@ export function TaskItem({ task }) {
             value={editData.dueDate}
             onChange={(e) => setEditData({ ...editData, dueDate: e.target.value })}
           />
+          {errors.dueDate && <div className="form-error">{errors.dueDate}</div>}
         </div>
         <div className="task-actions">
           <button onClick={() => setIsEditing(false)}>Cancelar</button>
-          <button onClick={handleSave} className="save-btn">Guardar</button>
+          <button onClick={handleSave} className="save-btn" disabled={Object.keys(errors).length > 0}>Guardar</button>
         </div>
       </div>
     );
   }
+/* Agrega este estilo en tu CSS para los errores visuales:
+.form-error {
+  color: #d32f2f;
+  font-size: 0.95em;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+*/
 
   return (
     <div className={`task-item ${task.completed ? 'completed' : ''} priority-${task.priority}`}>
@@ -75,7 +109,7 @@ export function TaskItem({ task }) {
         <input
           type="checkbox"
           checked={task.completed}
-          onChange={() => toggleTask(task.id)}
+          onChange={() => toggleTask(task._id)}
         />
       </div>
       
