@@ -1,4 +1,6 @@
+
 import { createContext, useState, useEffect } from 'react';
+import * as taskService from '../services/taskService';
 
 export const TaskContext = createContext();
 
@@ -7,47 +9,42 @@ export function TaskProvider({ children }) {
   const [filter, setFilter] = useState('all'); // all, pending, completed
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Cargar tareas del localStorage al iniciar
+
+  // Cargar tareas del backend al iniciar
   useEffect(() => {
-    const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
+    async function fetchTasks() {
+      const data = await taskService.getTasks();
+      setTasks(data);
     }
+    fetchTasks();
   }, []);
 
-  // Guardar en localStorage cuando cambien las tareas
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
 
   // Crear tarea
-  const addTask = (task) => {
-    const newTask = {
-      ...task,
-      id: Date.now(),
-      completed: false,
-      createdAt: new Date().toISOString()
-    };
+  const addTask = async (task) => {
+    const newTask = await taskService.createTask(task);
     setTasks([newTask, ...tasks]);
   };
 
   // Actualizar tarea
-  const updateTask = (id, updatedFields) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, ...updatedFields } : task
-    ));
+  const updateTask = async (id, updatedFields) => {
+    const updated = await taskService.updateTask(id, updatedFields);
+    setTasks(tasks.map(task => task._id === id ? updated : task));
   };
 
   // Eliminar tarea
-  const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const deleteTask = async (id) => {
+    await taskService.deleteTask(id);
+    setTasks(tasks.filter(task => task._id !== id));
   };
 
   // Toggle completado
-  const toggleTask = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  const toggleTask = async (id) => {
+    const task = tasks.find(t => t._id === id);
+    if (task) {
+      const updated = await taskService.updateTask(id, { completed: !task.completed });
+      setTasks(tasks.map(t => t._id === id ? updated : t));
+    }
   };
 
   // Tareas filtradas
@@ -59,7 +56,7 @@ export function TaskProvider({ children }) {
     })
     .filter(task =>
       task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      (task.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     );
 
   return (
