@@ -20,8 +20,6 @@ export function TaskForm() {
     setErrors(validate(newFormData));
   };
 
-
-  // Validación de campos
   const validate = (data = formData) => {
     const newErrors = {};
     if (!data.title.trim()) {
@@ -35,7 +33,7 @@ export function TaskForm() {
     if (data.dueDate) {
       const today = new Date();
       const due = new Date(data.dueDate);
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
       if (due < today) {
         newErrors.dueDate = 'La fecha no puede ser pasada';
       }
@@ -64,60 +62,73 @@ export function TaskForm() {
     <div className="task-form-container">
       {!isOpen ? (
         <button className="add-task-btn" onClick={() => setIsOpen(true)}>
-          + Nueva Tarea
+          Nueva Tarea
         </button>
       ) : (
-        <form className="task-form" onSubmit={handleSubmit}>
-
-          <input
-            type="text"
-            name="title"
-            placeholder="Título de la tarea *"
-            value={formData.title}
-            onChange={handleChange}
-            maxLength={100}
-            autoFocus
-          />
-          {errors.title && <div className="form-error">{errors.title}</div>}
-
-          <textarea
-            name="description"
-            placeholder="Descripción (opcional)"
-            value={formData.description}
-            onChange={handleChange}
-            maxLength={500}
-            rows={3}
-          />
-          {errors.description && <div className="form-error">{errors.description}</div>}
-          
-          <div className="form-row">
-            <select
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-            >
-              <option value="low">Baja</option>
-              <option value="medium">Media</option>
-              <option value="high">Alta</option>
-            </select>
-            
+        <form onSubmit={handleSubmit} className="task-form">
+          <div className="form-group">
+            <label htmlFor="taskTitle">Título de la tarea *</label>
             <input
-              type="date"
-              name="dueDate"
-              value={formData.dueDate}
+              id="taskTitle"
+              type="text"
+              name="title"
+              value={formData.title}
               onChange={handleChange}
+              maxLength={100}
+              autoFocus
+              placeholder="Título de la tarea *"
+              className={errors.title ? 'input-error' : ''}
             />
-            {errors.dueDate && <div className="form-error">{errors.dueDate}</div>}
+            {errors.title && <span className="form-error">{errors.title}</span>}
           </div>
-          
+          <div className="form-group">
+            <label htmlFor="taskDesc">Descripción (opcional)</label>
+            <textarea
+              id="taskDesc"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              maxLength={500}
+              rows={3}
+              placeholder="Descripción (opcional)"
+              className={errors.description ? 'input-error' : ''}
+            />
+            {errors.description && <span className="form-error">{errors.description}</span>}
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="taskPriority">Prioridad</label>
+              <select
+                id="taskPriority"
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+              >
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="taskDueDate">Fecha límite</label>
+              <input
+                id="taskDueDate"
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className={errors.dueDate ? 'input-error' : ''}
+              />
+              {errors.dueDate && <span className="form-error">{errors.dueDate}</span>}
+            </div>
+          </div>
           <div className="form-actions">
-            <button type="button" onClick={() => setIsOpen(false)}>
+            <button type="button" className="btn btn-secondary" onClick={() => setIsOpen(false)}>
               Cancelar
             </button>
-            <button type="submit" className="submit-btn" disabled={Object.keys(errors).length > 0 || !formData.title.trim()}>
+            <button type="submit" className="btn btn-primary submit-btn" disabled={Object.keys(errors).length > 0 || !formData.title.trim()}>
               Crear Tarea
             </button>
-          
           </div>
         </form>
       )}

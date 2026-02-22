@@ -1,30 +1,25 @@
-
 import { useState } from 'react';
 import * as authService from '../services/authService';
 import { RecoverPassword } from './RecoverPassword';
 
 export function Login({ onLogin }) {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRecover, setShowRecover] = useState(false);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const data = await authService.login(form.email, form.password);
-      setLoading(false);
-      onLogin && onLogin(data.user);
+      const user = await authService.login(email, password);
+      onLogin && onLogin(user);
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   if (showRecover) {
@@ -32,31 +27,39 @@ export function Login({ onLogin }) {
   }
 
   return (
-    <form className="login-form" onSubmit={handleSubmit}>
-      <h2>Iniciar Sesión</h2>
-      <input
-        type="email"
-        name="email"
-        placeholder="Correo electrónico"
-        value={form.email}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Contraseña"
-        value={form.password}
-        onChange={handleChange}
-        required
-      />
-      {error && <div className="form-error">{error}</div>}
-      <button type="submit" disabled={loading}>
-        {loading ? 'Ingresando...' : 'Ingresar'}
-      </button>
-      <button type="button" onClick={() => setShowRecover(true)}>
-        ¿Olvidaste tu contraseña?
-      </button>
-    </form>
+    <div>
+      <h2 className="form-title">Iniciar Sesión</h2>
+      <form onSubmit={handleSubmit} className="auth-form">
+        <div className="form-group">
+          <label htmlFor="loginEmail">Correo electrónico</label>
+          <input
+            id="loginEmail"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="loginPassword">Contraseña</label>
+          <input
+            id="loginPassword"
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        {error && <div className="alert alert-danger">{error}</div>}
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Cargando...' : 'Ingresar'}
+          </button>
+          <button type="button" className="link-btn" onClick={() => setShowRecover(true)}>
+            Recuperar contraseña
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -15,7 +15,7 @@ export function TaskList() {
   return (
     <div className="task-list">
       {tasks.map(task => (
-        <TaskItem key={task.id} task={task} />
+        <TaskItem key={task._id} task={task} />
       ))}
     </div>
   );

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import * as authService from '../services/authService';
-import { useEffect } from 'react';
 
 export function ResetPassword({ email, onBack }) {
   const [code, setCode] = useState('');
@@ -16,8 +15,7 @@ export function ResetPassword({ email, onBack }) {
     setError('');
     setLoading(true);
     try {
-      // Validar solo el código
-      const res = await authService.validateRecoveryCode(email, code);
+      await authService.validateRecoveryCode(email, code);
       setStep('change');
     } catch (err) {
       setError(err.message || 'Código incorrecto');
@@ -42,47 +40,62 @@ export function ResetPassword({ email, onBack }) {
 
   if (step === 'validate') {
     return (
-      <form className="reset-form" onSubmit={handleValidate}>
-        <h2>Validar Código de Recuperación</h2>
-        <input
-          type="text"
-          name="code"
-          placeholder="Código de recuperación"
-          value={code}
-          onChange={e => setCode(e.target.value)}
-          required
-        />
-        {error && <div className="form-error">{error}</div>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Validando...' : 'Validar'}
-        </button>
-        <button type="button" onClick={onBack}>Volver</button>
-      </form>
+      <div>
+        <h2 className="form-title">Validar Código de Recuperación</h2>
+        <form onSubmit={handleValidate} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="recCode">Código de recuperación</label>
+            <input
+              id="recCode"
+              type="text"
+              name="code"
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              required
+            />
+          </div>
+          {error && <div className="alert alert-danger">{error}</div>}
+          <div className="form-actions">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Cargando...' : 'Validar'}
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>Volver</button>
+          </div>
+        </form>
+      </div>
     );
   }
+
   if (step === 'change') {
     if (redirect) {
       onBack();
       return null;
     }
     return (
-      <form className="reset-form" onSubmit={handleChangePassword}>
-        <h2>Restablecer Contraseña</h2>
-        <input
-          type="password"
-          name="newPassword"
-          placeholder="Nueva contraseña"
-          value={newPassword}
-          onChange={e => setNewPassword(e.target.value)}
-          required
-        />
-        {error && <div className="form-error">{error}</div>}
-        {success && <div className="form-success">{success}</div>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Actualizando...' : 'Actualizar'}
-        </button>
-        <button type="button" onClick={onBack}>Volver</button>
-      </form>
+      <div>
+        <h2 className="form-title">Restablecer Contraseña</h2>
+        <form onSubmit={handleChangePassword} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="newPass">Nueva contraseña</label>
+            <input
+              id="newPass"
+              type="password"
+              name="newPassword"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <div className="alert alert-danger">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
+          <div className="form-actions">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Cargando...' : 'Actualizar'}
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>Volver</button>
+          </div>
+        </form>
+      </div>
     );
   }
 }

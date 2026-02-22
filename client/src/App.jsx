@@ -12,22 +12,24 @@ function App() {
 
   if (!user) {
     return (
-      <div>
-        {showRegister ? (
-          <>
-            <Register onRegister={() => setShowRegister(false)} />
-            <button onClick={() => setShowRegister(false)}>
-              ¿Ya tienes cuenta? Inicia sesión
-            </button>
-          </>
-        ) : (
-          <>
-            <Login onLogin={setUser} />
-            <button onClick={() => setShowRegister(true)}>
-              ¿No tienes cuenta? Regístrate
-            </button>
-          </>
-        )}
+      <div className="auth-container">
+        <div className="auth-card">
+          {showRegister ? (
+            <>
+              <Register onRegister={() => setShowRegister(false)} />
+              <button className="link-btn" onClick={() => setShowRegister(false)}>
+                ¿Ya tienes cuenta? Inicia sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Login onLogin={setUser} />
+              <button className="link-btn" onClick={() => setShowRegister(true)}>
+                ¿No tienes cuenta? Regístrate
+              </button>
+            </>
+          )}
+        </div>
       </div>
     );
   }
@@ -36,9 +38,9 @@ function App() {
     <TaskProvider>
       <div className="app-container">
         <Header />
-        <div className="dashboard-header">
+        <div className="user-bar">
           <span>Bienvenido, {user.email}</span>
-          <button onClick={() => setUser(null)}>Salir</button>
+          <button className="btn btn-danger" onClick={() => setUser(null)}>Salir</button>
         </div>
         <TaskForm />
         <TaskList />

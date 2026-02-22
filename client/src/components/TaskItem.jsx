@@ -12,8 +12,6 @@ export function TaskItem({ task }) {
   });
   const [errors, setErrors] = useState({});
 
-
-  // Validación de campos al editar
   const validate = () => {
     const newErrors = {};
     if (!editData.title.trim()) {
@@ -27,7 +25,7 @@ export function TaskItem({ task }) {
     if (editData.dueDate) {
       const today = new Date();
       const due = new Date(editData.dueDate);
-      today.setHours(0,0,0,0);
+      today.setHours(0, 0, 0, 0);
       if (due < today) {
         newErrors.dueDate = 'La fecha no puede ser pasada';
       }
@@ -58,53 +56,62 @@ export function TaskItem({ task }) {
   if (isEditing) {
     return (
       <div className="task-item editing">
-        <input
-          type="text"
-          value={editData.title}
-          onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-          autoFocus
-        />
-        {errors.title && <div className="form-error">{errors.title}</div>}
-        <textarea
-          value={editData.description}
-          onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-          rows={2}
-        />
-        {errors.description && <div className="form-error">{errors.description}</div>}
-        <div className="form-row">
-          <select
-            value={editData.priority}
-            onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
-          >
-            <option value="low">Baja</option>
-            <option value="medium">Media</option>
-            <option value="high">Alta</option>
-          </select>
-          <input
-            type="date"
-            value={editData.dueDate}
-            onChange={(e) => setEditData({ ...editData, dueDate: e.target.value })}
-          />
-          {errors.dueDate && <div className="form-error">{errors.dueDate}</div>}
-        </div>
-        <div className="task-actions">
-          <button onClick={() => setIsEditing(false)}>Cancelar</button>
-          <button onClick={handleSave} className="save-btn" disabled={Object.keys(errors).length > 0}>Guardar</button>
+        <div className="task-content">
+          <div className="form-group">
+            <label>Título</label>
+            <input
+              type="text"
+              value={editData.title}
+              onChange={e => setEditData({ ...editData, title: e.target.value })}
+              autoFocus
+              className={errors.title ? 'input-error' : ''}
+            />
+            {errors.title && <span className="form-error">{errors.title}</span>}
+          </div>
+          <div className="form-group">
+            <label>Descripción</label>
+            <textarea
+              value={editData.description}
+              onChange={e => setEditData({ ...editData, description: e.target.value })}
+              rows={2}
+              className={errors.description ? 'input-error' : ''}
+            />
+            {errors.description && <span className="form-error">{errors.description}</span>}
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Prioridad</label>
+              <select
+                value={editData.priority}
+                onChange={e => setEditData({ ...editData, priority: e.target.value })}
+              >
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Fecha límite</label>
+              <input
+                type="date"
+                value={editData.dueDate}
+                onChange={e => setEditData({ ...editData, dueDate: e.target.value })}
+                className={errors.dueDate ? 'input-error' : ''}
+              />
+              {errors.dueDate && <span className="form-error">{errors.dueDate}</span>}
+            </div>
+          </div>
+          <div className="task-actions" style={{ flexDirection: 'row' }}>
+            <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>Cancelar</button>
+            <button className="btn btn-primary" onClick={handleSave} disabled={Object.keys(errors).length > 0}>Guardar</button>
+          </div>
         </div>
       </div>
     );
   }
-/* Agrega este estilo en tu CSS para los errores visuales:
-.form-error {
-  color: #d32f2f;
-  font-size: 0.95em;
-  margin-top: 2px;
-  margin-bottom: 4px;
-}
-*/
 
   return (
-    <div className={`task-item ${task.completed ? 'completed' : ''} priority-${task.priority}`}>
+    <div className={`task-item ${task.completed ? 'completed' : ''}`}>
       <div className="task-checkbox">
         <input
           type="checkbox"
@@ -112,7 +119,6 @@ export function TaskItem({ task }) {
           onChange={() => toggleTask(task._id)}
         />
       </div>
-      
       <div className="task-content">
         <h3 className="task-title">{task.title}</h3>
         {task.description && <p className="task-description">{task.description}</p>}
@@ -127,7 +133,6 @@ export function TaskItem({ task }) {
           )}
         </div>
       </div>
-      
       <div className="task-actions">
         <button onClick={() => setIsEditing(true)} title="Editar">✏️</button>
         <button onClick={handleDelete} title="Eliminar">🗑️</button>

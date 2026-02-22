@@ -45,53 +45,72 @@ export function Register({ onRegister }) {
 
   if (step === 'register') {
     return (
-      <form className="register-form" onSubmit={handleRegister}>
-        <h2>Registro</h2>
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        {error && <div className="form-error">{error}</div>}
-        {success && <div className="form-success">{success}</div>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Registrando...' : 'Registrarse'}
-        </button>
-      </form>
+      <div>
+        <h2 className="form-title">Registro</h2>
+        <form onSubmit={handleRegister} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="regEmail">Correo electrónico</label>
+            <input
+              id="regEmail"
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="regPassword">Contraseña</label>
+            <input
+              id="regPassword"
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          {error && <div className="alert alert-danger">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Cargando...' : 'Registrarse'}
+          </button>
+        </form>
+      </div>
     );
   }
+
   if (step === 'verify') {
     return (
-      <form className="verify-form" onSubmit={handleVerify}>
-        <h2>Verifica tu correo</h2>
-        <input
-          type="text"
-          name="code"
-          placeholder="Código de verificación"
-          value={code}
-          onChange={e => setCode(e.target.value)}
-          required
-        />
-        {error && <div className="form-error">{error}</div>}
-        {success && <div className="form-success">{success}</div>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Verificando...' : 'Verificar'}
-        </button>
-      </form>
+      <div>
+        <h2 className="form-title">Verifica tu correo</h2>
+        <form onSubmit={handleVerify} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="verifyCode">Código de verificación</label>
+            <input
+              id="verifyCode"
+              type="text"
+              name="code"
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              required
+            />
+          </div>
+          {error && <div className="alert alert-danger">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Cargando...' : 'Verificar'}
+          </button>
+        </form>
+      </div>
     );
   }
+
   if (step === 'done') {
-    return <div className="form-success">Usuario verificado correctamente. Ahora puedes iniciar sesión.</div>;
+    return (
+      <div className="alert alert-success">
+        Usuario verificado correctamente. Ahora puedes iniciar sesión.
+      </div>
+    );
   }
 }

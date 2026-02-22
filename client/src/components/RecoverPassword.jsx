@@ -26,25 +26,33 @@ export function RecoverPassword({ onBack }) {
 
   if (step === 'recover') {
     return (
-      <form className="recover-form" onSubmit={handleSubmit}>
-        <h2>Recuperar Contraseña</h2>
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        />
-        {error && <div className="form-error">{error}</div>}
-        {success && <div className="form-success">{success}</div>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Enviando...' : 'Enviar código'}
-        </button>
-        <button type="button" onClick={onBack}>Volver</button>
-      </form>
+      <div>
+        <h2 className="form-title">Recuperar Contraseña</h2>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="recoverEmail">Correo electrónico</label>
+            <input
+              id="recoverEmail"
+              type="email"
+              name="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          {error && <div className="alert alert-danger">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
+          <div className="form-actions">
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Cargando...' : 'Enviar código'}
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={onBack}>Volver</button>
+          </div>
+        </form>
+      </div>
     );
   }
+
   if (step === 'reset') {
     return <ResetPassword email={email} onBack={onBack} />;
   }
