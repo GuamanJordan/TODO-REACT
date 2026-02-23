@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as authService from '../services/authService';
 
 export function Register({ onRegister }) {
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ name: '', lastname: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,8 +18,13 @@ export function Register({ onRegister }) {
     setError('');
     setSuccess('');
     setLoading(true);
+    if (form.password !== form.confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      setLoading(false);
+      return;
+    }
     try {
-      await authService.register(form.email, form.password);
+      await authService.register(form.name, form.lastname, form.email, form.password);
       setSuccess('Se envió un código de verificación a tu correo.');
       setStep('verify');
     } catch (err) {
@@ -49,6 +54,28 @@ export function Register({ onRegister }) {
         <h2 className="form-title">Registro</h2>
         <form onSubmit={handleRegister} className="auth-form">
           <div className="form-group">
+            <label htmlFor="regName">Nombre</label>
+            <input
+              id="regName"
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="regLastname">Apellido</label>
+            <input
+              id="regLastname"
+              type="text"
+              name="lastname"
+              value={form.lastname}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
             <label htmlFor="regEmail">Correo electrónico</label>
             <input
               id="regEmail"
@@ -66,6 +93,17 @@ export function Register({ onRegister }) {
               type="password"
               name="password"
               value={form.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="regConfirmPassword">Confirmar contraseña</label>
+            <input
+              id="regConfirmPassword"
+              type="password"
+              name="confirmPassword"
+              value={form.confirmPassword}
               onChange={handleChange}
               required
             />

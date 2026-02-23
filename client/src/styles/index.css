@@ -1,3 +1,66 @@
+/* Dashboard Layout */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f6f8fa;
+}
+
+.sidebar {
+  width: 220px;
+  background: #222e3a;
+  color: #fff;
+  padding: 32px 0;
+  min-height: 100vh;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar nav ul li {
+  margin-bottom: 24px;
+}
+.sidebar nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 8px 24px;
+  display: block;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.sidebar nav ul li a:hover {
+  background: #1976d2;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 40px 48px;
+}
+
+.dashboard-summary {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.summary-card {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 24px 16px;
+  text-align: center;
+}
+.summary-card h3 {
+  font-size: 1.2rem;
+  color: #1976d2;
+  margin-bottom: 8px;
+}
+.dashboard-tasks {
+  margin-top: 24px;
+}
 /* Reset y base */
 body, html {
   margin: 0;

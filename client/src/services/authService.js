@@ -51,11 +51,11 @@ export async function login(email, password) {
   return data;
 }
 
-export async function register(email, password) {
+export async function register(name, lastname, email, password) {
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ name, lastname, email, password })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Error de registro');

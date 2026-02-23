@@ -14,8 +14,8 @@ export function Login({ onLogin }) {
     setError('');
     setLoading(true);
     try {
-      const user = await authService.login(email, password);
-      onLogin && onLogin(user);
+      const response = await authService.login(email, password);
+      onLogin && onLogin(response.user);
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');
     }

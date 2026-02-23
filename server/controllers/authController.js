@@ -91,11 +91,11 @@ const nodemailer = require('nodemailer');
 
 exports.register = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    // Validar dominio permitido
+    const { name, lastname, email, password } = req.body;
+    // Validar dominio permitido (acepta subdominios)
     const allowedDomains = ['gmail.com', 'outlook.com'];
-    const emailDomain = email.split('@')[1];
-    if (!allowedDomains.includes(emailDomain)) {
+    const emailDomain = email.split('@')[1].toLowerCase();
+    if (!allowedDomains.some(domain => emailDomain.endsWith(domain))) {
       return res.status(400).json({ message: 'Dominio de correo no permitido' });
     }
     if (!email || !password) {
@@ -108,7 +108,7 @@ exports.register = async (req, res) => {
     // Generar código de verificación
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, password: hashedPassword, verified: false, verificationCode });
+    const user = new User({ name, lastname, email, password: hashedPassword, verified: false, verificationCode });
     await user.save();
 
 
@@ -203,7 +203,7 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Credenciales inválidas' });
     }
-    res.json({ message: 'Login exitoso', user: { email: user.email, id: user._id } });
+    res.json({ message: 'Login exitoso', user: { email: user.email, id: user._id, name: user.name, lastname: user.lastname } });
   } catch (err) {
     res.status(500).json({ message: 'Error al iniciar sesión' });
   }

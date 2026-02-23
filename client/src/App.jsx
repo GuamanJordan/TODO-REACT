@@ -5,6 +5,7 @@ import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
+import { Sidebar } from './components/Sidebar';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,14 +37,33 @@ function App() {
 
   return (
     <TaskProvider>
-      <div className="app-container">
-        <Header />
-        <div className="user-bar">
-          <span>Bienvenido, {user.email}</span>
-          <button className="btn btn-danger" onClick={() => setUser(null)}>Salir</button>
+      <div className="dashboard-layout">
+        <Sidebar />
+        <div className="dashboard-main">
+          <Header />
+          <div className="user-bar">
+            <span>Bienvenido, {user.name ? `${user.name} ${user.lastname}` : user.email}</span>
+            <button className="btn btn-danger" onClick={() => setUser(null)}>Salir</button>
+          </div>
+          <div className="dashboard-summary">
+            <div className="summary-card">
+              <h3>Total tareas</h3>
+              {/* Aquí puedes mostrar el total de tareas */}
+            </div>
+            <div className="summary-card">
+              <h3>Pendientes</h3>
+              {/* Aquí puedes mostrar el total de tareas pendientes */}
+            </div>
+            <div className="summary-card">
+              <h3>Completadas</h3>
+              {/* Aquí puedes mostrar el total de tareas completadas */}
+            </div>
+          </div>
+          <div className="dashboard-tasks">
+            <TaskForm />
+            <TaskList />
+          </div>
         </div>
-        <TaskForm />
-        <TaskList />
       </div>
     </TaskProvider>
   );
