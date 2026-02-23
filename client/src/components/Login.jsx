@@ -1,6 +1,11 @@
+
+
 import { useState } from 'react';
 import * as authService from '../services/authService';
 import { RecoverPassword } from './RecoverPassword';
+
+
+import './LoginModern.css';
 
 export function Login({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -27,10 +32,16 @@ export function Login({ onLogin }) {
   }
 
   return (
-    <div>
-      <h2 className="form-title">Iniciar Sesión</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
+    <div className="login-modern-container">
+      <form className="login-modern-form" onSubmit={handleSubmit}>
+        <div className="login-modern-icon">
+          <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1976d2"/>
+            <path d="M16 8L20 24H12L16 8Z" fill="#fff"/>
+          </svg>
+        </div>
+        <h2 className="login-modern-title">Iniciar Sesión</h2>
+        <div className="login-modern-group">
           <label htmlFor="loginEmail">Correo electrónico</label>
           <input
             id="loginEmail"
@@ -38,9 +49,10 @@ export function Login({ onLogin }) {
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
+            autoComplete="username"
           />
         </div>
-        <div className="form-group">
+        <div className="login-modern-group">
           <label htmlFor="loginPassword">Contraseña</label>
           <input
             id="loginPassword"
@@ -48,16 +60,16 @@ export function Login({ onLogin }) {
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
         </div>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <div className="form-actions">
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Cargando...' : 'Ingresar'}
-          </button>
-          <button type="button" className="link-btn" onClick={() => setShowRecover(true)}>
-            Recuperar contraseña
-          </button>
+        {error && <div className="login-modern-error">{error}</div>}
+        <button type="submit" className="login-modern-btn" disabled={loading}>
+          {loading ? 'Cargando...' : 'Ingresar'}
+        </button>
+        <div className="login-modern-links">
+          <a href="#" onClick={e => { e.preventDefault(); setShowRecover(true); }}>Recuperar contraseña</a>
+          <a href="#" onClick={e => { e.preventDefault(); onLogin && onLogin(null); }}>¿No tienes cuenta? Regístrate</a>
         </div>
       </form>
     </div>
