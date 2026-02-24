@@ -146,11 +146,18 @@ exports.register = async (req, res) => {
     const mailUser = process.env.MAIL_USER;
     const mailPass = process.env.MAIL_PASS;
 
+    console.log('Email config:', mailUser, 'pass length:', mailPass ? mailPass.length : 0);
+
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: mailUser,
         pass: mailPass
+      },
+      tls: {
+        rejectUnauthorized: false
       },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
