@@ -142,20 +142,22 @@ exports.register = async (req, res) => {
     const user = new User({ name, lastname, email, password: hashedPassword, verified: false, verificationCode });
     await user.save();
 
-    // Intentar enviar email de verificación
-    let emailSent = false;
+    // Enviar email de verificación (obligatorio)
+    const mailUser = process.env.MAIL_USER;
+    const mailPass = process.env.MAIL_PASS;
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: mailUser,
+        pass: mailPass
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000
+    });
+
     try {
-      const mailUser = process.env.MAIL_USER;
-      const mailPass = process.env.MAIL_PASS;
-
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: mailUser,
-          pass: mailPass
-        }
-      });
-
       await transporter.sendMail({
         from: mailUser,
         to: email,
@@ -163,17 +165,14 @@ exports.register = async (req, res) => {
         text: `Tu código de verificación es: ${verificationCode}`,
         html: `<h2>Bienvenido a TaskFlow</h2><p>Tu código de verificación es: <strong>${verificationCode}</strong></p>`
       });
-      emailSent = true;
     } catch (mailErr) {
+      // Si falla el email, borrar el usuario para que pueda reintentar
       console.error('Error enviando email:', mailErr.message);
+      await User.findByIdAndDelete(user._id);
+      return res.status(500).json({ message: 'No se pudo enviar el correo de verificación. Intenta de nuevo.' });
     }
 
-    res.status(201).json({
-      message: emailSent
-        ? 'Usuario registrado. Revisa tu correo para verificar.'
-        : 'Usuario registrado. Tu código de verificación es: ' + verificationCode,
-      verificationCode: emailSent ? undefined : verificationCode
-    });
+    res.status(201).json({ message: 'Usuario registrado. Revisa tu correo para verificar.' });
   } catch (err) {
     console.error('Error en registro:', err.message);
     res.status(500).json({ message: 'Error en el registro' });
