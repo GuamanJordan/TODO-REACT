@@ -69,56 +69,30 @@ exports.recoverPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'Usuario no encontrado' });
     }
-    // Generar token de recuperación (simple, para ejemplo)
     const recoveryToken = Math.floor(100000 + Math.random() * 900000).toString();
     user.recoveryToken = recoveryToken;
     await user.save();
 
-    // Configuración flexible de nodemailer
-    const mailService = process.env.MAIL_SERVICE || 'gmail';
-    const mailUser = process.env.MAIL_USER;
-    const mailPass = process.env.MAIL_PASS;
-    let transporter;
-    if (mailService === 'gmail') {
-      transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: { user: mailUser, pass: mailPass }
-      });
-    } else if (mailService === 'sendgrid') {
-      transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: { user: mailUser, pass: mailPass }
-      });
-    } else if (mailService === 'mailgun') {
-      transporter = nodemailer.createTransport({
-        service: 'Mailgun',
-        auth: { user: mailUser, pass: mailPass }
-      });
-    } else {
-      transporter = nodemailer.createTransport({
-        host: process.env.MAIL_HOST,
-        port: process.env.MAIL_PORT,
-        secure: process.env.MAIL_SECURE === 'true',
-        auth: { user: mailUser, pass: mailPass }
-      });
-    }
-
-    await transporter.sendMail({
-      from: mailUser,
+    const sent = await sendEmail({
       to: email,
-      subject: 'Recuperación de contraseña',
-      text: `Tu código de recuperación es: ${recoveryToken}`
+      subject: 'Recuperación de contraseña - TaskFlow',
+      text: `Tu código de recuperación es: ${recoveryToken}`,
+      html: `<h2>TaskFlow</h2><p>Tu código de recuperación es: <strong>${recoveryToken}</strong></p>`
     });
+
+    if (!sent) {
+      return res.status(500).json({ message: 'Error al enviar correo de recuperación' });
+    }
 
     res.json({ message: 'Se envió un código de recuperación a tu correo.' });
   } catch (err) {
+    console.error('Error recover:', err.message);
     res.status(500).json({ message: 'Error al recuperar contraseña' });
   }
 };
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-
-const nodemailer = require('nodemailer');
+const sendEmail = require('../utils/sendEmail');
 
 exports.register = async (req, res) => {
   try {
@@ -143,35 +117,14 @@ exports.register = async (req, res) => {
     await user.save();
 
     // Enviar email de verificación (obligatorio)
-    const mailUser = process.env.MAIL_USER;
-    const mailPass = process.env.MAIL_PASS;
-
-    console.log('Email config:', mailUser, 'pass length:', mailPass ? mailPass.length : 0);
-
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: mailUser,
-        pass: mailPass
-      },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000
+    const sent = await sendEmail({
+      to: email,
+      subject: 'Código de verificación - TaskFlow',
+      text: `Tu código de verificación es: ${verificationCode}`,
+      html: `<h2>Bienvenido a TaskFlow</h2><p>Tu código de verificación es: <strong>${verificationCode}</strong></p>`
     });
 
-    try {
-      await transporter.sendMail({
-        from: mailUser,
-        to: email,
-        subject: 'Código de verificación - TaskFlow',
-        text: `Tu código de verificación es: ${verificationCode}`,
-        html: `<h2>Bienvenido a TaskFlow</h2><p>Tu código de verificación es: <strong>${verificationCode}</strong></p>`
-      });
-    } catch (mailErr) {
-      // Si falla el email, borrar el usuario para que pueda reintentar
-      console.error('Error enviando email:', mailErr.message);
+    if (!sent) {
       await User.findByIdAndDelete(user._id);
       return res.status(500).json({ message: 'No se pudo enviar el correo de verificación. Intenta de nuevo.' });
     }
