@@ -142,59 +142,40 @@ exports.register = async (req, res) => {
     const user = new User({ name, lastname, email, password: hashedPassword, verified: false, verificationCode });
     await user.save();
 
+    // Intentar enviar email de verificación
+    let emailSent = false;
+    try {
+      const mailUser = process.env.MAIL_USER;
+      const mailPass = process.env.MAIL_PASS;
 
-    // Configuración flexible de nodemailer
-    const mailService = process.env.MAIL_SERVICE || 'gmail';
-    const mailUser = process.env.MAIL_USER;
-    const mailPass = process.env.MAIL_PASS;
-
-    let transporter;
-    if (mailService === 'gmail') {
-      transporter = nodemailer.createTransport({
+      const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: mailUser,
           pass: mailPass
         }
       });
-    } else if (mailService === 'sendgrid') {
-      transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: mailUser,
-          pass: mailPass
-        }
+
+      await transporter.sendMail({
+        from: mailUser,
+        to: email,
+        subject: 'Código de verificación - TaskFlow',
+        text: `Tu código de verificación es: ${verificationCode}`,
+        html: `<h2>Bienvenido a TaskFlow</h2><p>Tu código de verificación es: <strong>${verificationCode}</strong></p>`
       });
-    } else if (mailService === 'mailgun') {
-      transporter = nodemailer.createTransport({
-        service: 'Mailgun',
-        auth: {
-          user: mailUser,
-          pass: mailPass
-        }
-      });
-    } else {
-      // Configuración genérica
-      transporter = nodemailer.createTransport({
-        host: process.env.MAIL_HOST,
-        port: process.env.MAIL_PORT,
-        secure: process.env.MAIL_SECURE === 'true',
-        auth: {
-          user: mailUser,
-          pass: mailPass
-        }
-      });
+      emailSent = true;
+    } catch (mailErr) {
+      console.error('Error enviando email:', mailErr.message);
     }
 
-    await transporter.sendMail({
-      from: mailUser,
-      to: email,
-      subject: 'Código de verificación',
-      text: `Tu código de verificación es: ${verificationCode}`
+    res.status(201).json({
+      message: emailSent
+        ? 'Usuario registrado. Revisa tu correo para verificar.'
+        : 'Usuario registrado. Tu código de verificación es: ' + verificationCode,
+      verificationCode: emailSent ? undefined : verificationCode
     });
-
-    res.status(201).json({ message: 'Usuario registrado. Revisa tu correo para verificar.' });
   } catch (err) {
+    console.error('Error en registro:', err.message);
     res.status(500).json({ message: 'Error en el registro' });
   }
 };
