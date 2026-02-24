@@ -150,14 +150,11 @@ exports.register = async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       auth: {
         user: mailUser,
         pass: mailPass
-      },
-      tls: {
-        rejectUnauthorized: false
       },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
