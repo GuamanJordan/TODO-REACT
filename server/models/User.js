@@ -7,7 +7,11 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   verified: { type: Boolean, default: false },
   verificationCode: { type: String },
-  recoveryToken: { type: String }
+  recoveryToken: { type: String },
+  settings: {
+    notifications: { type: Boolean, default: true },
+    theme: { type: String, default: 'light' }
+  }
 });
 
 module.exports = mongoose.model('User', userSchema);

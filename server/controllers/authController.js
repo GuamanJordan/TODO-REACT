@@ -1,3 +1,34 @@
+// Actualizar perfil de usuario
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { name, lastname, email } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    user.name = name || user.name;
+    user.lastname = lastname || user.lastname;
+    user.email = email || user.email;
+    await user.save();
+    res.json({ message: 'Perfil actualizado', user: { name: user.name, lastname: user.lastname, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ message: 'Error al actualizar perfil' });
+  }
+};
+
+// Actualizar configuración de usuario
+exports.updateSettings = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { settings } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    user.settings = settings;
+    await user.save();
+    res.json({ message: 'Configuración actualizada', settings: user.settings });
+  } catch (err) {
+    res.status(500).json({ message: 'Error al actualizar configuración' });
+  }
+};
 exports.validateRecoveryCode = async (req, res) => {
   try {
     const { email, code } = req.body;

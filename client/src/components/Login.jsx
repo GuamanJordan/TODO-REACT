@@ -69,7 +69,7 @@ export function Login({ onLogin }) {
         </button>
         <div className="login-modern-links">
           <a href="#" onClick={e => { e.preventDefault(); setShowRecover(true); }}>Recuperar contraseña</a>
-          <a href="#" onClick={e => { e.preventDefault(); onLogin && onLogin(null); }}>¿No tienes cuenta? Regístrate</a>
+            {/* Removed duplicate registration link */}
         </div>
       </form>
     </div>

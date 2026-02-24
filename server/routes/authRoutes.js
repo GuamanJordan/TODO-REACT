@@ -9,4 +9,8 @@ router.post('/recover', authController.recoverPassword);
 router.post('/reset-password', authController.resetPassword);
 router.post('/validate-recovery', authController.validateRecoveryCode);
 
+// Endpoints de perfil y configuración
+router.put('/profile/:id', authController.updateProfile);
+router.put('/settings/:id', authController.updateSettings);
+
 module.exports = router;

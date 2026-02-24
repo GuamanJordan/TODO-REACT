@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TaskProvider } from './context/TaskContext';
 import { Header } from './components/Header';
 import { TaskForm } from './components/TaskForm';
@@ -6,10 +6,50 @@ import { TaskList } from './components/TaskList';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { Sidebar } from './components/Sidebar';
+import { WelcomeBanner } from './components/WelcomeBanner';
+import { ProfileForm } from './components/ProfileForm';
+import { SettingsForm } from './components/SettingsForm';
+import { updateProfile, updateSettings } from './services/profileService';
 
 function App() {
   const [user, setUser] = useState(null);
   const [showRegister, setShowRegister] = useState(false);
+  const [view, setView] = useState('dashboard'); // dashboard | profile | settings
+  const [loading, setLoading] = useState(false);
+  // Modo oscuro
+  const theme = user?.settings?.theme || 'light';
+
+  useEffect(() => {
+    document.body.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  const handleProfileUpdate = async (form) => {
+    setLoading(true);
+    try {
+      const updated = await updateProfile(user.id, form);
+      setUser({ ...user, ...updated.user });
+      setView('dashboard');
+    } catch (err) {
+      alert(err.message || 'Error al actualizar perfil');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSettingsUpdate = async (form) => {
+    setLoading(true);
+    try {
+      const updated = await updateSettings(user.id, { settings: form });
+      setUser({ ...user, settings: updated.settings });
+      setView('dashboard');
+      // Aplica el tema inmediatamente
+      document.body.classList.toggle('dark', form.theme === 'dark');
+    } catch (err) {
+      alert(err.message || 'Error al actualizar configuración');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -38,31 +78,40 @@ function App() {
   return (
     <TaskProvider>
       <div className="dashboard-layout">
-        <Sidebar />
+        <Sidebar onNavigate={setView} view={view} />
         <div className="dashboard-main">
-          <Header />
-          <div className="user-bar">
-            <span>Bienvenido, {user.name ? `${user.name} ${user.lastname}` : user.email}</span>
-            <button className="btn btn-danger" onClick={() => setUser(null)}>Salir</button>
-          </div>
-          <div className="dashboard-summary">
-            <div className="summary-card">
-              <h3>Total tareas</h3>
-              {/* Aquí puedes mostrar el total de tareas */}
+          <WelcomeBanner user={user} onSettings={() => setView('settings')} />
+          {view === 'dashboard' && (
+            <>
+              <Header />
+              <div className="dashboard-summary">
+                <div className="summary-card">
+                  <h3>Total tareas</h3>
+                </div>
+                <div className="summary-card">
+                  <h3>Pendientes</h3>
+                </div>
+                <div className="summary-card">
+                  <h3>Completadas</h3>
+                </div>
+              </div>
+              <div className="dashboard-tasks">
+                <TaskForm />
+                <TaskList />
+              </div>
+            </>
+          )}
+          {view === 'profile' && (
+            <div className="dashboard-tasks">
+              <ProfileForm user={user} onUpdate={handleProfileUpdate} />
             </div>
-            <div className="summary-card">
-              <h3>Pendientes</h3>
-              {/* Aquí puedes mostrar el total de tareas pendientes */}
+          )}
+          {view === 'settings' && (
+            <div className="dashboard-tasks">
+              <SettingsForm user={user} onUpdate={handleSettingsUpdate} />
             </div>
-            <div className="summary-card">
-              <h3>Completadas</h3>
-              {/* Aquí puedes mostrar el total de tareas completadas */}
-            </div>
-          </div>
-          <div className="dashboard-tasks">
-            <TaskForm />
-            <TaskList />
-          </div>
+          )}
+          {loading && <div className="loading-overlay">Guardando...</div>}
         </div>
       </div>
     </TaskProvider>
