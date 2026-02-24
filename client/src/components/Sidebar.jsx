@@ -1,4 +1,4 @@
-export function Sidebar({ onNavigate, view }) {
+export function Sidebar({ onNavigate, view, user, onLogout }) {
   return (
     <aside className="sidebar sidebar-modern">
       <div className="sidebar-header">
@@ -42,6 +42,24 @@ export function Sidebar({ onNavigate, view }) {
           </li>
         </ul>
       </nav>
+      <div className="sidebar-footer">
+        {user && (
+          <div className="sidebar-user">
+            <div className="sidebar-user-avatar">
+              {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="sidebar-user-info">
+              <span className="sidebar-user-name">{user.name} {user.lastname}</span>
+              <span className="sidebar-user-email">{user.email}</span>
+            </div>
+          </div>
+        )}
+        <button className="sidebar-link sidebar-logout" onClick={onLogout}>
+          <span className="sidebar-link-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+          </span> Cerrar Sesión
+        </button>
+      </div>
     </aside>
   );
 }

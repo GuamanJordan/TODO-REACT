@@ -78,7 +78,7 @@ function App() {
   return (
     <TaskProvider>
       <div className="dashboard-layout">
-        <Sidebar onNavigate={setView} view={view} />
+        <Sidebar onNavigate={setView} view={view} user={user} onLogout={() => setUser(null)} />
         <div className="dashboard-main">
           <WelcomeBanner user={user} onSettings={() => setView('settings')} />
           {view === 'dashboard' && (
