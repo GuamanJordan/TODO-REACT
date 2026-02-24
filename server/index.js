@@ -12,7 +12,11 @@ connectDB();
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
